@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canada Mortgage Trends</title>
+    <meta name="description"
+        content="Dashboard tracking Canadian real estate mortgage funds and interest rates over time.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1 style="font-size: 2rem;">Funds Advanced, Outstanding Balances, & Interest Rates: New and Existing lending
+        </h1>
+        <p class="subtitle">Bank of Canada, Table: 10-10-0006-01</p>
+    </header>
+
+    <main>
+        <div id="loading" class="loader">
+            <div class="spinner"></div>
+            <span>Loading Data...</span>
+        </div>
+
+        <div id="dashboard" style="display: none;">
+            <div class="filters-container">
+
+                <div class="filter-group metric-toggle" id="groupMetric">
+                    <button class="metric-btn active" data-val="funds advanced">Funds Advanced</button>
+                    <button class="metric-btn" data-val="outstanding balances">Outstanding Balances</button>
+                    <input type="hidden" id="metricType" value="funds advanced">
+                </div>
+
+
+                <div class="filter-group">
+                    <label>Loan Type:</label>
+                    <select id="loanType">
+                        <option value="residential">Residential Mortgages</option>
+                        <option value="auto_loans">Auto Loans</option>
+                        <option value="credit_cards">Credit Card Loans</option>
+                        <option value="loc">Personal LOC</option>
+                        <option value="personal_other">Other Personal Loans</option>
+                        <option value="business">Business & Commercial</option>
+                    </select>
+                </div>
+
+                <div class="filter-group" id="groupRate">
+                    <label>Rate Type:</label>
+                    <div class="slicer-container" id="rateType">
+                        <button class="slicer-btn active" data-val="variable">Variable Rate</button>
+                        <button class="slicer-btn active" data-val="fixed_1">Fixed (< 1 Year)</button>
+                                <button class="slicer-btn active" data-val="fixed_1to3">Fixed (1 to 3 Years)</button>
+                                <button class="slicer-btn active" data-val="fixed_3to5">Fixed (3 to 5 Years)</button>
+                                <button class="slicer-btn active" data-val="fixed_5plus">Fixed (5+ Years)</button>
+                    </div>
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:0.5rem;">
+                        <button class="slicer-control-btn" data-target="rateType" data-action="all">Select All</button>
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <span style="font-size:0.8rem; color:var(--text-muted);">Combine:</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="combineRate" title="Combine on Graph">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-group" id="groupInsured">
+                    <label>Insurance:</label>
+                    <div class="slicer-container" id="insuranceType">
+                        <button class="slicer-btn active" data-val="insured">Insured</button>
+                        <button class="slicer-btn active" data-val="uninsured">Uninsured</button>
+                    </div>
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:0.5rem;">
+                        <button class="slicer-control-btn" data-target="insuranceType" data-action="all">Select
+                            All</button>
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <span style="font-size:0.8rem; color:var(--text-muted);">Combine:</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="combineInsurance" title="Combine on Graph">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-group" id="groupLoc" style="display: none;">
+                    <label>LOC Type:</label>
+                    <div class="slicer-container" id="locType">
+                        <button class="slicer-btn active" data-val="secured">Secured</button>
+                        <button class="slicer-btn active" data-val="unsecured">Unsecured</button>
+                    </div>
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:0.5rem;">
+                        <button class="slicer-control-btn" data-target="locType" data-action="all">Select All</button>
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <span style="font-size:0.8rem; color:var(--text-muted);">Combine:</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="combineLoc" title="Combine on Graph">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-group" id="groupBusiness" style="display: none;">
+                    <label>Business Product:</label>
+                    <div class="slicer-container" id="businessType">
+                        <button class="slicer-btn active" data-val="regulated">Regulated non-bank fin.
+                            institutions</button>
+                        <button class="slicer-btn active" data-val="lease">Lease receivables</button>
+                        <button class="slicer-btn active" data-val="loans_indiv">Loans to individuals and
+                            others</button>
+                        <button class="slicer-btn active" data-val="non_residential">Non-residential mortgages</button>
+                    </div>
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:0.5rem;">
+                        <button class="slicer-control-btn" data-target="businessType" data-action="all">Select
+                            All</button>
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <span style="font-size:0.8rem; color:var(--text-muted);">Combine:</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="combineBusiness" title="Combine on Graph">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="flex-basis: 100%; display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                    <div class="filter-group date-group">
+                        <label>Start Month:</label>
+                        <div class="date-selectors">
+                            <select class="month-sel" id="startMonthSel"></select>
+                            <select class="year-sel" id="startYearSel"></select>
+                        </div>
+                    </div>
+
+                    <div class="filter-group date-group">
+                        <label>End Month:</label>
+                        <div class="date-selectors">
+                            <select class="month-sel" id="endMonthSel"></select>
+                            <select class="year-sel" id="endYearSel"></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-container"></div>
+
+            <div class="dashboard-grid"></div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
