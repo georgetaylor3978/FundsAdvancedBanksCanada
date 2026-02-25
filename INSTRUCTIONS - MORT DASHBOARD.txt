@@ -1,0 +1,24 @@
+Here is exactly what that Branch setting does, along with the paths you need!
+
+1. What did changing the "Branch" to "main" do?
+Think of a Branch in Git like a specific version or draft of your codebase. When we pushed your code from your computer to GitHub, we uploaded it to the default primary branch, which is called main.
+
+By default, GitHub Pages is turned off (set to "None"). When you went into the Settings and changed the source dropdown to main, you basically flipped the switch and told GitHub: "Hey, take all the HTML, CSS, JavaScript, and JSON data sitting on my main branch, and host it publicly as a live website!"
+
+From now on, anytime our 
+
+update.bat
+ script pushes new JSON data to that main branch, GitHub Pages will automatically see the change and re-publish your live website within a couple of minutes to reflect the new numbers.
+
+2. Where to save your future CSV files
+When the Bank of Canada releases new data, download their CSV file (making sure it is named Funds Balances Rates BoC.csv) and drop it into this exact folder on your computer, replacing the old one: C:\Users\kroon\.gemini\antigravity\playground\mortgage-dashboard\Funds Balances Rates BoC.csv
+
+3. Where is the 
+
+update.bat
+ script?
+The automated update script is sitting right next to that CSV file in the identical folder. You can find it and double-click it here: 
+
+C:\Users\kroon.gemini\antigravity\playground\mortgage-dashboard\update.bat
+
+Once you double-click that file, it will quietly read the new CSV you dropped in, format it for the web, and push it up to that main branch on GitHub so your live site updates without you having to write a single line of code!
