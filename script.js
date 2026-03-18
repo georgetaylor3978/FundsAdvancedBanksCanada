@@ -15,10 +15,9 @@ const chartOptions = {
         legend: {
             labels: {
                 color: '#c9d1d9',
-                boxWidth: 28,
-                boxHeight: 10,
-                useBorderRadius: true,
-                borderRadius: 2,
+                usePointStyle: true,
+                boxWidth: 32,
+                boxHeight: 12,
                 padding: 20
             },
             position: 'top'
@@ -70,8 +69,8 @@ const chartOptions = {
 };
 
 const colors = [
-    '#00f2fe', '#4facfe', '#9b51e0', '#ffb199', '#00e676',
-    '#f6d365', '#fda085', '#84fab0', '#8fd3f4', '#a18cd1', '#fbc2eb'
+    '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+    '#ec4899', '#06b6d4', '#84cc16', '#ff8a65', '#9c27b0'
 ];
 const rateColor = '#ff0844'; // Red for interest rates
 
@@ -421,7 +420,8 @@ function updateDashboard() {
                 borderWidth: 1,
                 fill: true,
                 yAxisID: 'y',
-                stack: 'Stack 0'
+                stack: 'Stack 0',
+                pointStyle: 'rectRounded'
             };
             datasets.push(ds);
 
@@ -461,7 +461,8 @@ function updateDashboard() {
                 pointRadius: 0,
                 pointHoverRadius: 6,
                 tension: 0.2, // Reduced tension
-                yAxisID: 'y1'
+                yAxisID: 'y1',
+                pointStyle: 'line'
             });
         }
         cIdx++;

@@ -2,7 +2,7 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const path = require('path');
 
-const inputFilePath = path.join(__dirname, '..', 'infrared-plasma', '-temp', 'Funds Balances Rates BoC.csv');
+const inputFilePath = path.join(__dirname, 'Funds Balances Rates BoC.csv');
 const outputFilePath = path.join(__dirname, 'data.json');
 
 const rawData = [];
