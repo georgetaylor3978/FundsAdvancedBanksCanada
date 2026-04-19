@@ -1,85 +1,119 @@
-const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: {
-        mode: 'index',
-        intersect: false,
-    },
-    plugins: {
-        title: {
-            display: true,
-            color: '#fff',
-            font: { size: 18, family: 'Inter', weight: '600' },
-            padding: { top: 10, bottom: 20 }
-        },
-        legend: {
-            labels: {
-                color: '#c9d1d9',
-                padding: 20,
-                generateLabels: function(chart) {
-                    const original = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-                    original.forEach(label => {
-                        if (label.text.includes('(%)')) {
-                            // Creates a wider, line-styled icon regardless of the pointRadius attribute
-                            label.pointStyle = 'line';
-                            label.lineWidth = 4;
-                            label.pointStyleWidth = 32; 
-                        } else {
-                            label.pointStyle = 'rectRounded';
-                            label.pointStyleWidth = 20; 
-                        }
-                    });
-                    return original;
-                },
-                usePointStyle: true
+/* ── Chart colours are set dynamically in buildChartOptions() ── */
+
+function getChartColors() {
+    const s = getComputedStyle(document.body);
+    return {
+        tick:         s.getPropertyValue('--chart-tick').trim(),
+        grid:         s.getPropertyValue('--chart-grid').trim(),
+        titleColor:   s.getPropertyValue('--chart-title-color').trim(),
+        legendColor:  s.getPropertyValue('--chart-legend-color').trim(),
+        tooltipBg:    s.getPropertyValue('--chart-tooltip-bg').trim(),
+        tooltipTitle: s.getPropertyValue('--chart-tooltip-title').trim(),
+        tooltipBody:  s.getPropertyValue('--chart-tooltip-body').trim(),
+        sourceColor:  s.getPropertyValue('--chart-source-color').trim(),
+    };
+}
+
+// Builds a fresh options object using current CSS vars
+function buildChartOptions() {
+    const cc = getChartColors();
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            title: {
+                display: true,
+                color: cc.titleColor,
+                font: { size: 18, family: 'Inter', weight: '600' },
+                padding: { top: 10, bottom: 20 }
             },
-            position: 'top'
-        },
-        tooltip: {
-            backgroundColor: 'rgba(22, 27, 34, 0.9)',
-            titleColor: '#fff',
-            bodyColor: '#c9d1d9',
-            borderColor: 'rgba(255, 255, 255, 0.1)',
-            borderWidth: 1,
-            padding: 12,
-            cornerRadius: 8,
-            callbacks: {
-                label: function (context) {
-                    let label = context.dataset.label || '';
-                    if (label) label += ': ';
-                    if (context.dataset.yAxisID === 'y1') {
-                        label += context.parsed.y.toFixed(2) + '%';
-                    } else {
-                        label += '$' + context.parsed.y.toFixed(1) + 'B';
+            legend: {
+                labels: {
+                    color: cc.legendColor,
+                    padding: 20,
+                    generateLabels: function(chart) {
+                        const original = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                        original.forEach(label => {
+                            if (label.text.includes('(%)')) {
+                                label.pointStyle = 'line';
+                                label.lineWidth = 4;
+                                label.pointStyleWidth = 32;
+                            } else {
+                                label.pointStyle = 'rectRounded';
+                                label.pointStyleWidth = 20;
+                            }
+                        });
+                        return original;
+                    },
+                    usePointStyle: true
+                },
+                position: 'top'
+            },
+            tooltip: {
+                backgroundColor: cc.tooltipBg,
+                titleColor: cc.tooltipTitle,
+                bodyColor: cc.tooltipBody,
+                borderColor: 'rgba(255, 255, 255, 0.1)',
+                borderWidth: 1,
+                padding: 12,
+                cornerRadius: 8,
+                callbacks: {
+                    label: function (context) {
+                        let label = context.dataset.label || '';
+                        if (label) label += ': ';
+                        if (context.dataset.yAxisID === 'y1') {
+                            label += context.parsed.y.toFixed(2) + '%';
+                        } else {
+                            label += '$' + context.parsed.y.toFixed(1) + 'B';
+                        }
+                        return label;
                     }
-                    return label;
                 }
             }
-        }
-    },
-    scales: {
-        x: {
-            grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
-            ticks: { color: '#8b949e', maxTicksLimit: 12 }
         },
-        y: {
-            type: 'linear',
-            display: true,
-            position: 'left',
-            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-            ticks: { color: '#8b949e' },
-            beginAtZero: false
-        },
-        y1: {
-            type: 'linear',
-            display: true,
-            position: 'right',
-            grid: { drawOnChartArea: false },
-            ticks: { color: '#8b949e' },
-            beginAtZero: false
+        scales: {
+            x: {
+                grid: { color: cc.grid, drawBorder: false },
+                ticks: { color: cc.tick, maxTicksLimit: 12 }
+            },
+            y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                grid: { color: cc.grid },
+                ticks: { color: cc.tick },
+                beginAtZero: false
+            },
+            y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                grid: { drawOnChartArea: false },
+                ticks: { color: cc.tick },
+                beginAtZero: false
+            }
         }
+    };
+}
+
+// Source footnote plugin — draws "BoC, Table: 10-10-0006-01" bottom-right of chart area
+const sourceFootnotePlugin = {
+    id: 'sourceFootnote',
+    afterDraw(chart) {
+        const { ctx, chartArea } = chart;
+        if (!chartArea) return;
+        const cc = getChartColors();
+        ctx.save();
+        ctx.font = '11px Inter, system-ui, sans-serif';
+        ctx.fillStyle = cc.sourceColor;
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText('BoC, Table: 10-10-0006-01', chartArea.right, chartArea.bottom - 2);
+        ctx.restore();
     }
 };
+Chart.register(sourceFootnotePlugin);
 
 const colors = [
     '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
@@ -488,6 +522,7 @@ function updateDashboard() {
 
     renderChart(labels, datasets, hasOverallFunds, hasOverallRates, uiFilters.metric, fullGraphTitle, fundsMin, ratesMin);
     populateStats(latestRates);
+    populateCagr(groupedData, filteredMonths);
 }
 
 function renderChart(labels, datasets, hasFunds, hasRates, metricName, fullGraphTitle, fundsMin, ratesMin) {
@@ -509,20 +544,22 @@ function renderChart(labels, datasets, hasFunds, hasRates, metricName, fullGraph
 
     const ctx = document.getElementById('mainChart').getContext('2d');
 
-    const options = JSON.parse(JSON.stringify(chartOptions));
+    const options = buildChartOptions();
+    const cc = getChartColors();
     const titleStr = metricName === 'outstanding balances' ? 'Outstanding Balances (Billions $)' : 'Funds Advanced (Billions $)';
 
     options.plugins.title.text = fullGraphTitle;
+    options.plugins.title.color = cc.titleColor;
 
     options.scales.y.display = hasFunds;
-    options.scales.y.title = { display: hasFunds, text: titleStr, color: '#8b949e' };
+    options.scales.y.title = { display: hasFunds, text: titleStr, color: cc.tick };
 
     if (hasFunds && fundsMin !== Infinity) {
         options.scales.y.min = Math.max(0, fundsMin * 0.9); // 10% buffer below minimum amount
     }
 
     options.scales.y1.display = hasRates;
-    options.scales.y1.title = { display: hasRates, text: 'Interest Rate (%)', color: '#8b949e' };
+    options.scales.y1.title = { display: hasRates, text: 'Interest Rate (%)', color: cc.tick };
 
     if (hasRates) {
         options.scales.y1.beginAtZero = true;
@@ -536,9 +573,63 @@ function renderChart(labels, datasets, hasFunds, hasRates, metricName, fullGraph
     });
 }
 
+// ─── CAGR CARDS ──────────────────────────────────────────────
+function populateCagr(groupedData, filteredMonths) {
+    const row = document.getElementById('cagrRow');
+    row.innerHTML = '';
+
+    if (!filteredMonths || filteredMonths.length < 2) return;
+    const nMonths = filteredMonths.length;
+    const nYears  = nMonths / 12;
+    const startLabel = filteredMonths[0];
+    const endLabel   = filteredMonths[nMonths - 1];
+
+    for (const [groupName, group] of Object.entries(groupedData)) {
+        if (!group.hasFunds) continue;
+
+        const firstVal = group.fDataSum.find(v => v !== null && v > 0);
+        const lastVal  = [...group.fDataSum].reverse().find(v => v !== null && v > 0);
+        if (!firstVal || !lastVal || firstVal === 0) continue;
+
+        const cagr = (Math.pow(lastVal / firstVal, 1 / nYears) - 1) * 100;
+        const isPos = cagr >= 0;
+        const sign  = isPos ? '+' : '';
+        const color = isPos ? '#00e676' : '#ff1744';
+
+        const card = document.createElement('div');
+        card.className = 'cagr-card';
+        card.innerHTML = `
+            <div class="cagr-label">${groupName} — CAGR</div>
+            <div class="cagr-value" style="color:${color}">${sign}${cagr.toFixed(2)}%</div>
+            <div class="cagr-note">${startLabel} → ${endLabel} (${nYears.toFixed(1)} yrs)</div>
+        `;
+        row.appendChild(card);
+    }
+
+    if (row.children.length === 0) {
+        row.innerHTML = '';
+    }
+}
+
+// ─── THEME TOGGLE ────────────────────────────────────────────
+function initThemeToggle() {
+    const btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    if (localStorage.getItem('debtTheme') === 'light') {
+        document.body.classList.add('light-mode');
+    }
+    btn.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        const isLight = document.body.classList.contains('light-mode');
+        localStorage.setItem('debtTheme', isLight ? 'light' : 'dark');
+        updateDashboard(); // redraw charts with new colours
+    });
+}
+
 function populateStats(ratesInfo) {
     const container = document.querySelector('.stats-container');
     container.innerHTML = '';
+
 
     if (ratesInfo.length === 0) {
         container.innerHTML = '<div style="color:#8b949e; grid-column: 1 / -1;">No active rate stats available for the selected filters.</div>';
@@ -590,4 +681,7 @@ function shortenLabel(str) {
     return res;
 }
 
-document.addEventListener('DOMContentLoaded', initDashboard);
+document.addEventListener('DOMContentLoaded', () => {
+    initDashboard();
+    initThemeToggle();
+});

@@ -11,6 +11,157 @@
   --accent-orange: #ffb199;
   --shadow-color: rgba(0, 0, 0, 0.5);
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  /* chart vars */
+  --chart-tick: #8b949e;
+  --chart-grid: rgba(255, 255, 255, 0.05);
+  --chart-title-color: #ffffff;
+  --chart-legend-color: #c9d1d9;
+  --chart-tooltip-bg: rgba(22, 27, 34, 0.9);
+  --chart-tooltip-title: #ffffff;
+  --chart-tooltip-body: #c9d1d9;
+  --chart-source-color: rgba(139,148,158,0.7);
+}
+
+/* ── LIGHT MODE ──────────────────────────────────────── */
+body.light-mode {
+  --bg-color: #f0f4fc;
+  --panel-bg: rgba(255, 255, 255, 0.85);
+  --panel-border: rgba(0, 0, 0, 0.1);
+  --text-main: #1a202c;
+  --text-muted: #4a5568;
+  --shadow-color: rgba(0, 0, 0, 0.12);
+  --chart-tick: #4a5568;
+  --chart-grid: rgba(0, 0, 0, 0.06);
+  --chart-title-color: #1a202c;
+  --chart-legend-color: #2d3748;
+  --chart-tooltip-bg: rgba(255, 255, 255, 0.97);
+  --chart-tooltip-title: #1a202c;
+  --chart-tooltip-body: #4a5568;
+  --chart-source-color: rgba(74, 85, 104, 0.75);
+}
+
+body.light-mode {
+  background-image: radial-gradient(circle at top right, rgba(79, 172, 254, 0.06), transparent 40%),
+    radial-gradient(circle at bottom left, rgba(155, 81, 224, 0.06), transparent 40%);
+}
+
+body.light-mode header {
+  background: rgba(240, 244, 252, 0.9);
+}
+
+body.light-mode .filter-group select,
+body.light-mode .filter-group input {
+  background: rgba(240, 244, 252, 0.9);
+  color: var(--text-main);
+  border-color: rgba(0,0,0,0.15);
+}
+
+body.light-mode .slicer-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.55);
+}
+
+body.light-mode .slicer-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.8);
+}
+
+body.light-mode .slicer-control-btn {
+  color: var(--text-muted);
+}
+
+body.light-mode .slicer-control-btn:hover {
+  color: var(--text-main);
+}
+
+body.light-mode .metric-toggle {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .metric-btn,
+body.light-mode .mode-btn {
+  color: var(--text-muted);
+}
+
+body.light-mode .chart-title {
+  color: var(--text-main);
+}
+
+body.light-mode .stat-value {
+  color: var(--text-main);
+}
+
+body.light-mode .toggle-slider {
+  background-color: rgba(0,0,0,0.12);
+  border-color: rgba(0,0,0,0.2);
+}
+
+/* ── THEME TOGGLE BUTTON ─────────────────────────────── */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  background: rgba(0,242,254,0.08);
+  transform: rotate(15deg);
+}
+.icon-moon { display: none; }
+.icon-sun  { display: block; }
+body.light-mode .icon-sun  { display: none; }
+body.light-mode .icon-moon { display: block; }
+
+/* ── CAGR ROW ────────────────────────────────────────── */
+.cagr-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+.cagr-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 1.1rem 1.4rem;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px var(--shadow-color);
+  position: relative;
+  overflow: hidden;
+}
+.cagr-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 4px;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+}
+.cagr-label {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 0.35rem;
+}
+.cagr-value {
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.cagr-note {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
 }
 
 * {
@@ -30,6 +181,7 @@ body {
   background-image: radial-gradient(circle at top right, rgba(79, 172, 254, 0.1), transparent 40%),
     radial-gradient(circle at bottom left, rgba(155, 81, 224, 0.1), transparent 40%);
   background-attachment: fixed;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 header {
