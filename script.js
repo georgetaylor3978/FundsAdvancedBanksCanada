@@ -15,10 +15,23 @@ const chartOptions = {
         legend: {
             labels: {
                 color: '#c9d1d9',
-                usePointStyle: true,
-                boxWidth: 32,
-                boxHeight: 12,
-                padding: 20
+                padding: 20,
+                generateLabels: function(chart) {
+                    const original = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                    original.forEach(label => {
+                        if (label.text.includes('(%)')) {
+                            // Creates a wider, line-styled icon regardless of the pointRadius attribute
+                            label.pointStyle = 'line';
+                            label.lineWidth = 4;
+                            label.pointStyleWidth = 32; 
+                        } else {
+                            label.pointStyle = 'rectRounded';
+                            label.pointStyleWidth = 20; 
+                        }
+                    });
+                    return original;
+                },
+                usePointStyle: true
             },
             position: 'top'
         },
